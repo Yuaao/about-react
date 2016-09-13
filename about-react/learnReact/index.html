@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../build/react.js"></script>
+    <script src="../build/react-dom.js"></script>
+    <script src="../build/browser.min.js"></script>
+
+</head>
+<body>
+<div id="example"></div>
+<div id="example1"></div>
+<div id="example2"></div>
+<div id="example3"></div>
+<div id="example4"></div>
+<div id="example5"></div>
+<div id="example6"></div>
+<div id="example7"></div>
+<div id="example8"></div>
+<div id="example9"></div>
+<script type="text/babel">
+    //ReactDOM.render()
+    ReactDOM.render(
+        <h1>Hello,world</h1>,
+        document.getElementById("example")
+
+    )
+    //JSX 语法
+    var names=['apple','lucky','bobby'];
+    ReactDOM.render(
+        <div>
+        {
+            names.map(function(name){
+                return <div>Hello,{name}!</div>
+            })
+        }
+        </div>,
+        document.getElementById("example1")
+
+
+    )
+    var arr =[
+        <h1>hello,world!</h1>,
+        <h2>React is a good things</h2>
+    ];
+    ReactDOM.render(
+        <div>{arr}</div>,
+        document.getElementById("example2")
+
+
+    );
+    //四、组件
+    var HelloMessage=React.createClass({
+        render:function(){
+            return <h1>Hello{this.props.name}，{this.props.className}</h1>;
+        }
+       // 组件类只能包含一个顶层标签，否则也会报错。不能是兄弟元素 class 要为className for为 htmlFor这两个为保留字不能作为命名
+    });
+    ReactDOM.render(
+        <HelloMessage name='john' className='gy'/>,
+        document.getElementById("example3")
+
+    );
+    //this.props.children
+    //this.props 对象的属性与组件的属性一一对应，但是有一个例外，就是 this.props.children 属性。它表示组件的所有子节点
+    //上面代码的 NoteList 组件有两个 span 子节点，它们都可以通过 this.props.children 读取，运行结果如下。
+    var NoteList=React.createClass({
+        render:function(){
+            return (
+                <ol>
+                {
+                   React.Children.map(this.props.children,function(child){
+                        return <li>{child}</li>
+
+
+                   })
+
+                }
+
+                </ol>
+
+            )
+
+        }
+    })
+    ReactDOM.render(
+        <NoteList>
+            <span>hello</span>
+            <span>world</span>
+        </NoteList>,
+        document.getElementById("example4")
+
+
+    )
+    //PropTypes 组件类的PropTypes属性
+    //验证别人使用组件时，提供的参数是否符合要求。 这里的title必须是string类型
+    var MyTitle=React.createClass({
+        //默认属性
+
+        getDefaultProps : function () {
+            return {
+              title : 'Hello World'
+            };
+        },
+        // 用来验证组件实例的属性是否符合要求
+        propTypes:{
+            title:React.PropTypes.string.isRequired,
+
+        },
+        render:function(){
+            return <h1>{this.props.title}</h1>
+        }
+
+
+    })
+
+    var da="122";
+    ReactDOM.render(
+    <MyTitle title={da}/>,
+    document.getElementById("example5")
+
+    )
+    ReactDOM.render(
+        <MyTitle />,
+        document.getElementById("example6")
+
+    )
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
