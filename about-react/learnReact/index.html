@@ -6,6 +6,7 @@
     <script src="../build/react.js"></script>
     <script src="../build/react-dom.js"></script>
     <script src="../build/browser.min.js"></script>
+    <script src="../build/jquery.js"></script>
 
 </head>
 <body>
@@ -19,6 +20,11 @@
 <div id="example7"></div>
 <div id="example8"></div>
 <div id="example9"></div>
+<div id="example10"></div>
+<div id="example11"></div>
+<div id="example12"></div>
+<div id="example13"></div>
+<div id="example14"></div>
 <script type="text/babel">
     //ReactDOM.render()
     ReactDOM.render(
@@ -126,6 +132,241 @@
         document.getElementById("example6")
 
     )
+    //获取真实的DOM节点ref属性
+    var MyComponent=React.createClass({
+        handleClick:function(){
+            //获得当前元素this.refs.[refName] 属性获取的是真实 DOM
+            console.log(this.refs)
+             //点击聚焦
+            this.refs.myTextInput.focus();
+
+            console.log(this.refs.myTextInput.value)
+
+
+        },
+        render:function(){
+            return(
+                <div>
+                    <input type="text" ref='myTextInput'/>
+                    <input type="button" value="Focus the text input" onClick={this.handleClick}/>
+                </div>
+
+
+            )
+
+        }
+
+
+    });
+    ReactDOM.render(
+          <MyComponent />,
+          document.getElementById("example7")
+
+    )
+    //this.state
+    var LikeButton=React.createClass({
+        //定义初始状态
+        getInitialState:function(){
+            return {liked:false};
+        },
+        //操作
+        handleClick:function(event){
+            //setState--改变原始状态
+            this.setState({
+                liked:!this.state.liked
+            })
+
+        },
+        render:function(){
+            var text=this.state.liked?"like":"haven\'t liked";
+            return(
+                <p onClick={this.handleClick}>
+                You{text}this.clik to toggle
+
+                </p>
+
+            )
+
+        }
+
+
+    });
+    ReactDOM.render(
+        <LikeButton/>,
+        document.getElementById("example8")
+
+    )
+    //表单 获取表单中的value填写到下面的p标签
+    var Input=React.createClass({
+        getInitialState: function() {
+            return {value:'Hello!'};
+        },
+        handleChange:function(event){
+            this.setState({
+                value:event.target.value
+
+            })
+        },
+        render:function(){
+            var value = this.state.value;
+            return (
+              <div>
+                <input type="text" value={value} onChange={this.handleChange} />
+                <p>{value}</p>
+              </div>
+            );
+
+        }
+    })
+    ReactDOM.render(
+        <Input/>,
+        document.getElementById("example9")
+
+    )
+    /* 组件的生命周期
+    * Mounting：已插入真实DOM
+    * Updating:正在被重新渲染
+    * Unmounting:已移出真实DOM
+    *三种状态的五种处理函数
+    *componentWillMount()
+    *componentDidMount()
+    *componentWillUpdate(object nextProps, object nextState)
+    *componentDidUpdate(object prevProps, object prevState)
+    *componentWillUnmount()
+    componentWillReceiveProps(object nextProps)：已加载组件收到新的参数时调用
+    shouldComponentUpdate(object nextProps, object nextState)：组件判断是否重新渲染时调用
+    */
+    var Hello=React.createClass({
+        getInitialState:function(){
+            return {
+                opacity:1.0
+            }
+        },
+        componentDidMount:function(){
+            this.timer=setInterval(function(){
+                var opacity = this.state.opacity;
+                opacity -= .05;
+                if(opacity<0.1){
+                    opacity=1;
+
+                }
+                this.setState({
+                    opacity:opacity
+
+                });
+
+            }.bind(this),100)
+
+        },
+        render:function(){
+            return (
+            //第二重大括号表示样式对象
+                <div style={{opacity:this.state.opacity}}>
+                    Hello,{this.props.name}
+                </div>
+
+            );
+
+        }
+
+    })
+   /* ReactDOM.render(
+        <Hello name="world"/>,
+        document.getElementById("example10")
+
+    )
+    */
+    //ajax
+  var UserGist = React.createClass({
+  getInitialState: function() {
+    return {
+      username: '',
+      lastGistUrl: ''
+    };
+  },
+
+  componentDidMount: function() {
+    $.get(this.props.source, function(result) {
+            console.log(result)
+      var lastGist = result[0];
+      if (this.isMounted()) {
+        this.setState({
+          username: lastGist.owner.login,
+          lastGistUrl: lastGist.html_url
+        });
+      }
+    }.bind(this));
+  },
+
+  render: function() {
+    return (
+      <div>
+        {this.state.username}'s last gist is
+        <a href={this.state.lastGistUrl}>here</a>.
+      </div>
+    );
+  }
+});
+
+ReactDOM.render(
+  <UserGist source="https://api.github.com/users/octocat/gists" />,
+  document.getElementById("example11")
+);
+var RepoList=React.createClass({
+    getInitialState:function(){
+        return{
+            loading:true,
+            error:null,
+            data:null
+        }
+
+    },
+    componentDidMount(){
+        this.props.promise.then(
+            value => this.setState({loading:false,data:value}),
+            error => this.setState({loading:false,error:error})
+
+
+        )
+
+    },
+    render:function(){
+        if(this.state.loading){
+            return <span>Loading...</span>;
+        
+        }else if(this.state.error!==null){
+         //处理错误
+            return <span>Error:{this.state.error.message}</span>
+        
+        }else{
+        //渲染模板
+            var repos =this.state.data.items;
+            var repoList =repos.map(function (repo){
+                return (
+                  <li>
+                    <a href={repo.html_url}>{repo.name}</a> ({repo.stargazers_count} stars) <br/> {repo.description}
+                  </li>
+                );
+            
+            });
+            return(
+                <main>
+                    <h1>Most Popular JavaScript Projects in Github</h1>
+                    <ol>{repoList}</ol>
+                </main>
+            )
+        
+        }
+    
+    }
+
+})
+ReactDOM.render(
+  <RepoList
+    promise={$.getJSON('https://api.github.com/search/repositories?q=javascript&sort=stars')}
+  />,
+  document.getElementById("example12")
+);
 
 
 
